@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaseDatos">
         <activity
-            android:name=".Vista.CargarDatosActivity"
+            android:name=".Vista.activities.CargarDatosActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,9 +19,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Vista.MainActivity" />
-
-        <activity android:name=".Vista.CardEstudianteActivity"/>
+        <activity android:name=".Vista.activities.MainActivity" />
 
     </application>
 

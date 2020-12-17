@@ -1,4 +1,4 @@
-package com.andorid.basedatos.Modelo.Dao;
+package com.andorid.basedatos.Dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;

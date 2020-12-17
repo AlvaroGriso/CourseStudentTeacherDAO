@@ -1,4 +1,4 @@
-package com.andorid.basedatos.Vista;
+package com.andorid.basedatos.Vista.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,9 +8,9 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.andorid.basedatos.bbdd.DataBase;
+import com.andorid.basedatos.databinding.ActivitySplashBinding;
 import com.andorid.basedatos.Modelo.Course;
-import com.andorid.basedatos.Modelo.bbdd.DataBase;
-import com.andorid.basedatos.databinding.ActivityCargarDatosBinding;
 import com.andorid.basedatos.Modelo.Student;
 import com.andorid.basedatos.Modelo.Teacher;
 
@@ -30,7 +30,7 @@ public class CargarDatosActivity extends AppCompatActivity {
 
     String TAG = CargarDatosActivity.class.getSimpleName();
 
-    ActivityCargarDatosBinding binding;
+    ActivitySplashBinding binding;
     DataBase dataBase;
 
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -38,7 +38,7 @@ public class CargarDatosActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityCargarDatosBinding.inflate(getLayoutInflater());
+        binding = ActivitySplashBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         dataBase = DataBase.getDatabase(this);
         obtenerData();
@@ -70,18 +70,18 @@ public class CargarDatosActivity extends AppCompatActivity {
 
         try {
             JSONObject jsonObject = new JSONObject(loadJSONFromAsset("datos.json"));
-            Log.v(TAG, "obtenerData jsonObject: " + jsonObject);
+            //Log.v(TAG, "obtenerData jsonObject: " + jsonObject);
 
             JSONArray jsonArrayCourse = jsonObject.getJSONArray("asignaturas");
-            Log.v(TAG, "obtenerData jsonArrayCourse: " + jsonArrayCourse);
+            //Log.v(TAG, "obtenerData jsonArrayCourse: " + jsonArrayCourse);
             if (jsonArrayCourse != null && jsonArrayCourse.length() > 0) {
                 //dataBase.courseDao().deleteAll();
                 List<Course> courseList = new ArrayList<>();
                 for (int i = 0; i < jsonArrayCourse.length(); i++) {
                     String tmp = jsonArrayCourse.getString(i);
                     //Log.v(TAG, "obtenerData tmp: " + tmp);
-                    Course misAsignaturas = new Course(i, tmp);
-                    courseList.add(misAsignaturas);
+                    Course course = new Course(i, tmp);
+                    courseList.add(course);
                     //Log.v(TAG, "obtenerData courseList: " + courseList);
                 }
                 saveCourse(courseList);
@@ -89,7 +89,7 @@ public class CargarDatosActivity extends AppCompatActivity {
 
 
             JSONArray jsonArrayTeacher = jsonObject.getJSONArray("profesores");
-            Log.v(TAG, "obtenerData jsonArrayTeacher: " + jsonArrayTeacher);
+            //Log.v(TAG, "obtenerData jsonArrayTeacher: " + jsonArrayTeacher);
             if (jsonArrayTeacher != null && jsonArrayTeacher.length() > 0) {
                 //dataBase.teacherDao().deleteAll();
                 List<Teacher> teacherList = new ArrayList<>();
@@ -107,7 +107,7 @@ public class CargarDatosActivity extends AppCompatActivity {
 
 
             JSONArray jsonArrayStudent = jsonObject.getJSONArray("alumnos");
-            Log.v(TAG, "obtenerData jsonArrayStudent: " + jsonArrayStudent);
+            //Log.v(TAG, "obtenerData jsonArrayStudent: " + jsonArrayStudent);
             if (jsonArrayStudent != null && jsonArrayStudent.length() > 0) {
                 //dataBase.studentDao().deleteAll();
                 List<Student> studentList = new ArrayList<>();
@@ -150,19 +150,19 @@ public class CargarDatosActivity extends AppCompatActivity {
             is.read(buffer);
             is.close();
             json = new String(buffer, "UTF-8");
-            Log.v(TAG, "loadJSONFromAsset json ok");
+            //Log.v(TAG, "loadJSONFromAsset json ok");
         } catch (IOException ex) {
-            Log.v(TAG, "loadJSONFromAsset Error: " + ex.getMessage());
+            //Log.v(TAG, "loadJSONFromAsset Error: " + ex.getMessage());
             ex.printStackTrace();
             return null;
         }
         return json;
     }
 
-    private void saveCourse(List<Course> misAsignaturas) {
+    private void saveCourse(List<Course> course) {
         //Log.v(TAG, "saveCourse course: " + course);
         getDisposables().add(
-                dataBase.courseDao().insert(misAsignaturas)
+                dataBase.courseDao().insert(course)
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(Schedulers.io())
                         .subscribe(result -> {
@@ -172,9 +172,11 @@ public class CargarDatosActivity extends AppCompatActivity {
                                 }
                         )
         );
+        //dataBase.courseDao().insert(course);
     }
 
     private void saveTeacher(List<Teacher> teacherList) {
+        //dataBase.teacherDao().insert(teacherList);
         //Log.v(TAG, "saveTeacher teacherList: " + teacherList);
         getDisposables().add(
                 dataBase.teacherDao().insert(teacherList)
@@ -202,6 +204,7 @@ public class CargarDatosActivity extends AppCompatActivity {
                                 }
                         )
         );
+        //dataBase.studentDao().insert(studentList);
     }
 
     private void moveToMain() {

@@ -1,23 +1,26 @@
-package com.andorid.basedatos.Vista;
+package com.andorid.basedatos.Vista.fragment;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.andorid.basedatos.bbdd.DataBase;
+import com.andorid.basedatos.databinding.FragmentPrincipalBinding;
 import com.andorid.basedatos.Modelo.Course;
-import com.andorid.basedatos.Modelo.bbdd.DataBase;
-import com.andorid.basedatos.databinding.ActivityMainBinding;
 import com.andorid.basedatos.Modelo.Student;
 import com.andorid.basedatos.Modelo.Teacher;
-import com.andorid.basedatos.Modelo.bbdd.Constants;
-import com.andorid.basedatos.adapter.AdapterRecycler;
+import com.andorid.basedatos.Interfaces.OnFragmentInteractionListener;
+import com.andorid.basedatos.Vista.adapter.AdapterRecycler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,29 +28,68 @@ import java.util.List;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class FragmentPrincipal extends Fragment {
 
-    String TAG = MainActivity.class.getSimpleName();
+    public static final String TAG = FragmentPrincipal.class.getSimpleName();
 
-    ActivityMainBinding binding;
+    private FragmentPrincipalBinding binding;
+
+    private OnFragmentInteractionListener mFragmentInteractionListener;
+
     DataBase dataBase;
     AdapterRecycler mAdapter;
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        dataBase = DataBase.getDatabase(this);
-        setupRecyclerView();
-        llenarSpinner();
-        Log.v(TAG, "onCreate: ");
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mFragmentInteractionListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new ClassCastException(
+                    context.toString() + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDetach() {
+        super.onDetach();
+        mFragmentInteractionListener = null;
+    }
+
+    public static FragmentPrincipal newInstance() {
+        FragmentPrincipal fragment = new FragmentPrincipal();
+        Bundle args = fragment.getArguments();
+        if (args == null) {
+            args = new Bundle();
+        }
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        dataBase = DataBase.getDatabase(getContext());
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentPrincipalBinding.inflate(inflater, container, false);
+        setupRecyclerView();
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        llenarSpinner();
+    }
+
+    @Override
+    public void onDestroy() {
         super.onDestroy();
         if (disposables != null) {
             disposables.dispose();
@@ -61,13 +103,20 @@ public class MainActivity extends AppCompatActivity {
             public boolean onItemClick(View view, Student item, int position, boolean longPress) {
                 if (!longPress) {
                     Log.d(TAG, "item: " + item);
-                    movetToDetailStudent(item);
+                    if(mFragmentInteractionListener!=null){
+                        mFragmentInteractionListener.onAddFragmentToStack(
+                                FragmentDetailStudent.newInstance(item),
+                                true,
+                                true,
+                                FragmentDetailStudent.TAG
+                                );
+                    }
                 }
                 return false;
             }
         });
 
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         binding.recycler.setHasFixedSize(true);
@@ -90,11 +139,11 @@ public class MainActivity extends AppCompatActivity {
                                     Log.e(TAG, "llenarSpinner subscribe courseList: " + courseList);
                                     ArrayList<String> tmpList = new ArrayList<>();
                                     tmpList.add("Seleccione");
-                                    for (Course misAsignaturas : courseList) {
-                                        tmpList.add(misAsignaturas.getCourse());
+                                    for (Course course : courseList) {
+                                        tmpList.add(course.getCourse());
                                     }
                                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                                            this,
+                                            getActivity(),
                                             android.R.layout.simple_spinner_dropdown_item, tmpList);
                                     binding.spSelectCourse.setAdapter(arrayAdapter);
                                 }, throwable -> {
@@ -135,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void viewTeacher(Teacher teacher) {
-        this.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (teacher != null) {
@@ -173,17 +222,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void viewStudent(List<Student> viewTeacher) {
-        this.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mAdapter.setData(viewTeacher);
             }
         });
-    }
-
-    private void movetToDetailStudent(Student student) {
-        Intent intent = new Intent(MainActivity.this, CardEstudianteActivity.class);
-        intent.putExtra(Constants.Extras.EXTRA_STUDENT, student);
-        startActivity(intent);
     }
 }

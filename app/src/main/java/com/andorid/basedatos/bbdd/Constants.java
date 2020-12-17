@@ -1,4 +1,4 @@
-package com.andorid.basedatos.Modelo.bbdd;
+package com.andorid.basedatos.bbdd;
 
 import com.andorid.basedatos.BuildConfig;
 

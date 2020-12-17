@@ -1,4 +1,4 @@
-package com.andorid.basedatos.Modelo.bbdd;
+package com.andorid.basedatos.bbdd;
 
 import android.content.Context;
 
@@ -8,10 +8,10 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.andorid.basedatos.Dao.CourseDao;
+import com.andorid.basedatos.Dao.StudentDao;
+import com.andorid.basedatos.Dao.TeacherDao;
 import com.andorid.basedatos.Modelo.Course;
-import com.andorid.basedatos.Modelo.Dao.CourseDao;
-import com.andorid.basedatos.Modelo.Dao.StudentDao;
-import com.andorid.basedatos.Modelo.Dao.TeacherDao;
 import com.andorid.basedatos.Modelo.Student;
 import com.andorid.basedatos.Modelo.Teacher;
 

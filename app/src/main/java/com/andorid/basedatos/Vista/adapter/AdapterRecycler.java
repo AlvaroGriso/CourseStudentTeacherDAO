@@ -1,4 +1,4 @@
-package com.andorid.basedatos.adapter;
+package com.andorid.basedatos.Vista.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +17,11 @@ public class AdapterRecycler extends RecyclerView.Adapter<AdapterRecycler.viewHo
 
     private static final String TAG = AdapterRecycler.class.getSimpleName();
 
-    private List<Student> miLista;
-    private OnItemClickListener miListener;
+    private List<Student> mDataList;
+    private OnItemClickListener mListener;
 
     public AdapterRecycler() {
-        this.miLista = new ArrayList<>();
+        this.mDataList = new ArrayList<>();
     }
 
     @NonNull
@@ -34,13 +34,13 @@ public class AdapterRecycler extends RecyclerView.Adapter<AdapterRecycler.viewHo
 
     @Override
     public void onBindViewHolder(@NonNull final AdapterRecycler.viewHolder holder, int position) {
-        final Student item = miLista.get(position);
+        final Student item = mDataList.get(position);
         holder.bind(item);
     }
 
     @Override
     public long getItemId(int position) {
-        return miLista.get(position).getCodigo();
+        return mDataList.get(position).getCodigo();
     }
 
     @Override
@@ -50,21 +50,21 @@ public class AdapterRecycler extends RecyclerView.Adapter<AdapterRecycler.viewHo
 
     @Override
     public int getItemCount() {
-        if (miLista != null && miLista.size() > 0) {
-            return miLista.size();
+        if (mDataList != null && mDataList.size() > 0) {
+            return mDataList.size();
         } else {
             return 0;
         }
     }
 
     public void setOnListener(OnItemClickListener listener) {
-        miListener = listener;
+        mListener = listener;
     }
 
     public void setData(List<Student> list) {
         if (list == null) list = new ArrayList<>();
-        miLista.clear();
-        this.miLista = list;
+        mDataList.clear();
+        this.mDataList = list;
         notifyDataSetChanged();
     }
 
@@ -85,8 +85,8 @@ public class AdapterRecycler extends RecyclerView.Adapter<AdapterRecycler.viewHo
             binding.containerItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (miListener != null)
-                        miListener.onItemClick(view, item, getAdapterPosition(), false);
+                    if (mListener != null)
+                        mListener.onItemClick(view, item, getAdapterPosition(), false);
                 }
             });
         }
